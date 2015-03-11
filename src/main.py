@@ -71,7 +71,7 @@ def startServer():
         "now we will restart the process"
         import subprocess
         print 'some process is already running on port ' + str(port) + '. Killing it..' 
-        subprocess.call('fuser -k ' + str(port) + '/tcp',shell=True) #kill the system process running on requested port
+        subprocess.call('sudo fuser -k ' + str(port) + '/tcp',shell=True) #kill the system process running on requested port
         sleep (1)
         #restart CommandNet Processor now
         startServer()
