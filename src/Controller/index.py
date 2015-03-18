@@ -18,29 +18,26 @@ from networkx.readwrite import json_graph
 from pymongo import MongoClient
 import time
 
-from app import *
+#from app import *
+import app
 from GraphLib.index import *
 from NLProcessor.nl_processor import *
 from commandnet import *
 from _line_profiler import label
 
-# Configuration File
-Config = Config()
-
-# Connect to MongoDB to query Entity_to_Command
-db = MongoClient(str(Config.get('MongoDB')['host']), int(Config.get('MongoDB')['port']))
-Entity_to_Command_collection = db[str(Config.get('MongoDB')['database'])].Entity_to_Command
-
 # Initialize NLProcessor (NER)
 nlp = NLProcessor()
 CommandNet = CommandNet()
 
+Config = app.Config()
+Entity_to_Command_dict = {}
 
 class CommandNetProcessor():
     G = nx.DiGraph()
     vertices = []
-
+    
     def __init__(self):
+        self.load_Entity_to_Command_in_memory()
         pass
 
     def __queryNER(self, literature):
@@ -81,17 +78,35 @@ class CommandNetProcessor():
                 
         end_time = int(round(time.time() * 1000))
         
-        print "\n*NER Time Profile:*",
-        "Start Time: ", start_time, "ms",
-        "End Time: ", end_time, "ms",
-        "Diff: ", end_time - start_time, "ms", "\n"
+#         print "\n*NER Time Profile:*",
+#         "Start Time: ", start_time, "ms",
+#         "End Time: ", end_time, "ms",
+#         "Diff: ", end_time - start_time, "ms", "\n"
         
         # Uncomment below line to check NER Output
         #print json.dumps(gl.jsonOutput())
         return gl.G
-    
+
+    def load_Entity_to_Command_in_memory(self):
+        global Entity_to_Command_dict
+
+        # Connect to MongoDB to query Entity_to_Command
+        db = MongoClient(str(Config.get('MongoDB')['host']), int(Config.get('MongoDB')['port']))
+        Entity_to_Command_collection = db[str(Config.get('MongoDB')['database'])].Entity_to_Command
+
+        RecordSet = Entity_to_Command_collection.find({})
+        for Record in RecordSet:
+            tmpList = []
+            try:
+                tmpList = Entity_to_Command_dict[Record['entity_url']]
+            except:
+                pass
+            tmpList.append(Record['command'])
+            Entity_to_Command_dict[Record['entity_url']] = tmpList
+
     """[Psecode]* Literature to CommandNet Graph Builder():"""
     def LiteratureToCommandNetGraphBuilder(self,literature):
+        global Entity_to_Command_dict
         
         start_time = int(round(time.time() * 1000))
         
@@ -105,13 +120,16 @@ class CommandNetProcessor():
             G.node[n]['entity'] = entities
             
             """[Psecode #1053] Find 'Commands' of each 'Entity'
-            by looking up 'Entity_to_Command' collection in mongodo
+            by looking up 'Entity_to_Command' dict (which is pre-fetched from Entity_to_Command collection in  mongodb)
             """
             Commands = []
             for entity in entities:
-                RecordSet = Entity_to_Command_collection.find({'entity_url':entity})
-                for Record in RecordSet:
-                    Commands.append(Record['command'])
+                try:
+                    for Command in Entity_to_Command_dict[entity]:
+                        Commands.append(Command)
+                except:
+                    #this try-except was put in place as sometimes '~NoTag' gets passed in 'entity' field. Which obviously doesn't exists as Key in Entity_to_Command_dict
+                    pass
             Unique_Commands = list(set(Commands))
         
             G.node[n]['probable_commands'] = Unique_Commands
@@ -211,17 +229,17 @@ class CommandNetProcessor():
 #         print "Graph = ", G.nodes(data=True)
         
         
-        for n,d in G.nodes_iter(data=True):
-            entities = d['entity']
-            
-            Commands = []
-            for entity in entities:
-                RecordSet = Entity_to_Command_collection.find({'entity_url':entity})
-                for Record in RecordSet:
-                    Commands.append(Record['command'])
-            Unique_Commands = list(set(Commands))
+#         for n,d in G.nodes_iter(data=True):
+#             entities = d['entity']
+#             
+#             Commands = []
+#             for entity in entities:
+#                 RecordSet = Entity_to_Command_collection.find({'entity_url':entity})
+#                 for Record in RecordSet:
+#                     Commands.append(Record['command'])
+#             Unique_Commands = list(set(Commands))
         
-            print "n = " + str(n) + ", entity = " + str(entities) + ", probable_commands = " + str(Unique_Commands)
+#             print "n = " + str(n) + ", entity = " + str(entities) + ", probable_commands = " + str(Unique_Commands)
 
         
         return G
@@ -232,9 +250,9 @@ class CommandNetProcessor():
         """
         
         # For debugging purpose 
-        print '--------------------COMMAND------------------------'
-        print 'Command = ' + Command
-        print 'Vertex = ' + str(G.node[VertexID])
+#         print '--------------------COMMAND------------------------'
+#         print 'Command = ' + Command
+#         print 'Vertex = ' + str(G.node[VertexID])
         
         """[Psecode] call the CommandNet function requested (A)"""
         ParameterExpressions = eval('CommandNet.' + Command + '(mode=\'parameter_expression\')')
@@ -459,7 +477,7 @@ class CommandNetProcessor():
         separatorToBeChecked = False
         
         for x in range(rightNodeToOrigin,-1,-1):
-            print G.edges(nbunch=None, data=False)
+#             print G.edges(nbunch=None, data=False)
             vertexToMatch = G.node[siblings[x]]
             commandOrLabelMatched = False
             
