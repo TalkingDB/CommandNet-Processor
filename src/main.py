@@ -75,6 +75,12 @@ def startServer():
         sleep (1)
         #restart CommandNet Processor now
         startServer()
+    except Exception as e:
+        import traceback
+        print e
+        print e.args
+        print traceback.print_exc(file=sys.stdout)
+        
         
 if __name__ == "__main__":
 
