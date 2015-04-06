@@ -49,7 +49,8 @@ class NLProcessor():
             """((?<=[A-Za-z0-9])[\s]*[""" + punctuation + """][\s]*(?=[A-Za-z])        #replaces 'abc,xyz'; 'abc, xyz'; 'abc ,xyz'; '123, xyz' to 'abc , xyz'
             |(?<=[A-Za-z])[\s]*[""" + punctuation + """][\s]*(?=[A-Za-z0-9])           #replaces 'xyz, 123' to 'xyz , 123'
             |(?<=[0-9])[\s]+[""" + punctuation + """][\s]*(?=[0-9])                    #replaces '123 ,456' to '123 , 456'
-                |(?<=[0-9])[\s]*[""" + punctuation + """][\s]+(?=[0-9]))               #replaces '123, 456' to '123 , 456'
+                |(?<=[0-9])[\s]*[""" + punctuation + """][\s]*(?=[0-9])               #replaces '123, 456' to '123 , 456'
+            |[""" + punctuation + """][\s]*$)                                         #replaces '123,'; 'abc.' to '123 , '
             """,                                
             " " + punctuation + " ",                                                 #to be replaced with
             strLiterature,                                                           #search in
