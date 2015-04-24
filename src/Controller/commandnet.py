@@ -110,6 +110,18 @@ class CommandNet():
                 "priority":3
             }
             return parameter_expression
+
+    def RemoveX(self, mode, subject=-1, object=-1):
+        if mode=='parameter_expression':
+            parameter_expression = {
+                "type": "SequenceExpression",
+                "sequence": [
+                                ['object:$token','subject:CommandNet>Noun'],
+                                ['object:$token','subject:$Noun_phrase']
+                            ],
+                "priority":3
+            }
+            return parameter_expression
     
     def MoreOf(self, mode, subject=-1, object=-1):
         if mode=='parameter_expression':
