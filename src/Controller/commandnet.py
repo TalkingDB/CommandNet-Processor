@@ -98,7 +98,19 @@ class CommandNet():
                 "priority":3
             }
             return parameter_expression
-    
+        
+    def Find(self, mode, subject=-1, object=-1):
+        if mode=='parameter_expression':
+            parameter_expression = {
+                "type": "SequenceExpression",
+                "sequence": [
+                                ['ignore:$token','subject:CommandNet>Noun'],
+                                ['ignore:$token','subject:$Noun_phrase']
+                            ],
+                "priority":3
+            }
+            return parameter_expression
+        
     def LessOf(self, mode, subject=-1, object=-1):
         if mode=='parameter_expression':
             parameter_expression = {

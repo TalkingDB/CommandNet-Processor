@@ -47,7 +47,13 @@ class CommandNetProcessor():
         start_time = int(round(time.time() * 1000))
         
         # TODO: remove below code when CNP starts handling 's
-        literature = literature.replace("'", "")
+        
+        if "'" in literature:
+            literature = literature.replace("'", "")
+        
+        if '"' in literature:
+            literature = literature.replace('"', ' %22 ').strip()
+               
         
         gl, last_node_id, instructions = nlp.process_user_instructions(literature)
         
