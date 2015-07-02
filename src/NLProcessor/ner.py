@@ -45,6 +45,8 @@ class NER():
             keyword = entity['surface_text']
 #            if (keyword == "cheese pizza"):
 #                print keyword
+            if type(keyword) is int:
+                keyword = str(keyword)
             keywords.append(keyword)
             EntityMetaData.append([entity['entity_url'], len(keyword.split())]) #[word, word count]
         x=0
