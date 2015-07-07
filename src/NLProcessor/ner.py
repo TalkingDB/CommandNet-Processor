@@ -42,7 +42,7 @@ class NER():
             entities = entityCollection.find({"$or": [{"approved_by_trainer":{"$exists": 1}},{"approved_by_trainer":{"$exists": 0},"disapproved_by_trainer":{"$exists": 0}}]})
         
         for entity in entities:
-            keyword = entity['surface_text']
+            keyword = str(entity['surface_text'])
 #            if (keyword == "cheese pizza"):
 #                print keyword
             keywords.append(keyword)

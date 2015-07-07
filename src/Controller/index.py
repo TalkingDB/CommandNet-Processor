@@ -23,7 +23,7 @@ import app
 from GraphLib.index import *
 from NLProcessor.nl_processor import *
 from commandnet import *
-from _line_profiler import label
+#from _line_profiler import label
 
 # Initialize NLProcessor (NER)
 nlp = NLProcessor()
