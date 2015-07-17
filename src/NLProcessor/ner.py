@@ -42,7 +42,10 @@ class NER():
             entities = entityCollection.find({"$or": [{"approved_by_trainer":{"$exists": 1}},{"approved_by_trainer":{"$exists": 0},"disapproved_by_trainer":{"$exists": 0}}]})
         
         for entity in entities:
-            keyword = str(entity['surface_text'])
+            try:
+                keyword = str(entity['surface_text'])
+            except UnicodeEncodeError:
+                keyword = str(entity['surface_text'].encode("utf-8"))
 #            if (keyword == "cheese pizza"):
 #                print keyword
             if type(keyword) is int:
