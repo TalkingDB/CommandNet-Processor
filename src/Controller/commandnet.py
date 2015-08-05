@@ -111,6 +111,20 @@ class CommandNet():
             }
             return parameter_expression
 
+    def TemperatureOfMeat(self, mode, subject=-1, object=-1):
+        if mode=='parameter_expression':
+            parameter_expression = {
+                "type": "SequenceExpression",
+                "sequence": [
+                                ['object:$token','subject:CommandNet>Noun'],
+                                ['subject:CommandNet>Noun$token','object:$token'],
+                                ['object:$token','subject:CommandNet>Noun'],
+                                ['subject:$Noun_phrase', 'object:$token']
+                            ],
+                "priority":3
+            }
+            return parameter_expression
+
     def RemoveX(self, mode, subject=-1, object=-1):
         if mode=='parameter_expression':
             parameter_expression = {
