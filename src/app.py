@@ -1,4 +1,4 @@
-import ConfigParser
+import configparser as ConfigParser
 import os
 
 class Config():

@@ -2,7 +2,7 @@ __author__="karan S. Sisodia"
 __date__ ="$Jun 3, 2014 11:49:49 PM$"
 
 import json
-import ner
+from . import ner
 import re
 import codecs
 # from stemming.porter2 import stem
@@ -10,8 +10,8 @@ from nltk.stem.wordnet import WordNetLemmatizer
 lmtzr = WordNetLemmatizer()
 
 #Database
-import database
-import entity_model
+from . import database
+from . import entity_model
 
 #Libs
 from GraphLib import index as GL
@@ -36,6 +36,10 @@ class NLProcessor():
         """
         Function to start process
         """
+        # Convert bytes to string if needed
+        if isinstance(s, bytes):
+            s = s.decode("utf-8", errors="ignore")
+
         separated_joined_words = self.__separate_joined_words(s)
         root_string = self.__get_root_word(separated_joined_words)
         return self.__get_ner_data(root_string)
