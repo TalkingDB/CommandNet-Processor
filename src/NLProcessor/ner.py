@@ -23,7 +23,7 @@ class NER():
         return self.find_named_entities(data, 0)
     
     def load_wikipedia_entities_in_memory(self):
-        print 'Initializing NER data...'
+        print ('Initializing NER data...')
         
         # load common words file
 #        fileWikiStopWords = open(self.common_words_file_path,'r')
@@ -34,13 +34,24 @@ class NER():
         mngClient = MongoClient("127.0.0.1",27017)
         db= mngClient.noisy_NER
         entityCollection = db.entity
-        if sys.argv[1:][2] == 'train_UIP_from_learnt_answers': #command line parameter passed to our process
-            #this mongo query loads only those surface_texts which have been marked as 'approved' by human trainers
+        if len(sys.argv) > 3 and sys.argv[3] == 'train_UIP_from_learnt_answers':
+            # load only approved
             entities = entityCollection.find({"approved_by_trainer":{"$exists": 1}}) 
-        elif sys.argv[1:][2] == 'compute_high_priority_training_questions':
-            #this mongo query loads only which have neither approved AND nor disapproved, or the ones which have only approved.
-            entities = entityCollection.find({"$or": [{"approved_by_trainer":{"$exists": 1}},{"approved_by_trainer":{"$exists": 0},"disapproved_by_trainer":{"$exists": 0}}]})
-        
+        elif len(sys.argv) > 3 and sys.argv[3] == 'compute_high_priority_training_questions':
+            # load mixed / pending
+            entities = entityCollection.find({
+                "$or": [
+                    {"approved_by_trainer": {"$exists": 1}},
+                    {
+                        "approved_by_trainer": {"$exists": 0},
+                        "disapproved_by_trainer": {"$exists": 0}
+                    }
+                ]
+            })
+
+        else:
+            # default behavior (important!)
+            entities = entityCollection.find({})
         for entity in entities:
             try:
                 keyword = str(entity['surface_text'])
@@ -78,7 +89,7 @@ class NER():
                     self.insert_entities_of_words(token2,x)
                 else:
                     self.insert_entities_of_words(words[y],x)
-        print "Ner Data Initialized Successfully!"
+        print ("Ner Data Initialized Successfully!")
 
     def insert_entities_of_words(self, token ='',EntityID = 0):
         if token != '':
@@ -292,7 +303,7 @@ class NER():
             endingWordID = nerTags[1]
             
             """[Psecode] insert tokens with ~NoTag"""
-            for i in xrange(lastWordIDAdded,startingWordID):
+            for i in range(lastWordIDAdded,startingWordID):
                 obj = {
                     'id' : '~NoTag',
                     'surface_text' : words[i],
@@ -329,7 +340,7 @@ class NER():
             prev = rdfURL
             
         #Insert ~NoTag after the last surface_text which was found
-        for i in xrange(lastWordIDAdded,len(words)):
+        for i in range(lastWordIDAdded,len(words)):
             obj = {
                 'id' : '~NoTag',
                 'surface_text' : words[i],

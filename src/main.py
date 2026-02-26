@@ -22,7 +22,7 @@ def startServer():
         sok.bind((address, port))
         sok.listen(5)
         
-        print 'CommandNet Processor started listning on ' + address + ':' + str(port), '\nPress Ctrl+C to stop the server.'
+        print (f"'CommandNet Processor started listning on ' + {address} + ':' + {str(port)}, '\nPress Ctrl+C to stop the server.'")
         
         cnp = Controller.CommandNetProcessor()
 
@@ -61,25 +61,25 @@ def startServer():
                     for i in nx.generate_graphml(graph_obj):
                         output += i
                 
-            conn.send(output) 
+            conn.send(output.encode('utf-8'))
             conn.close()
     except KeyboardInterrupt:
-        print '\nGood Bye!'
+        print ('\nGood Bye!')
         exit()
     except socket.error:
         "some process (most probably an another instance of CommandNet Processor) is already listening on the requested port"
         "now we will restart the process"
         import subprocess
-        print 'some process is already running on port ' + str(port) + '. Killing it..' 
+        print (f"'some process is already running on port ' + {str(port)} + '. Killing it..' ")
         subprocess.call('sudo fuser -k ' + str(port) + '/tcp',shell=True) #kill the system process running on requested port
         sleep (1)
         #restart CommandNet Processor now
         startServer()
     except Exception as e:
         import traceback
-        print e
-        print e.args
-        print traceback.print_exc(file=sys.stdout)
+        print (e)
+        print( e.args)
+        print( traceback.print_exc(file=sys.stdout))
         
         
 if __name__ == "__main__":
