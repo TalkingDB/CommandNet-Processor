@@ -1,6 +1,11 @@
 CommandNet Processor
 ====================
 
+> [!NOTE]
+> **Archived, last changed in December 2016.** This is the 2016 parse tree generator and named entity recogniser that TalkingDB grew from. It is kept for history and is not run anywhere.
+>
+> **Today's replacements:** [package-parse-tree](https://github.com/TalkingDB/package-parse-tree) turns a query into a category, instance and attribute tree over an ontology, and [package-named-entity-linker](https://github.com/TalkingDB/package-named-entity-linker) finds and links known entities in text without a statistical model, the same idea this project started.
+
 Listens on a port for incoming natural language input. Does [Named Entity Recognition][1] and generates [Parse Tree][2] of the natural language input (based on the training questions answered by user and bot in Training Portal) and returns it back to the client
 
 ## Contributing ##
